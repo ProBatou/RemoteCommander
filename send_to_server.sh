@@ -30,9 +30,9 @@ done
 # Affichez la liste des serveurs distants
 echo "Liste des serveurs distants: "
 index=0
-while read remote_server; do
+while read ip_server; do
   index=$((index + 1))
-  name=$(echo "$remote_server" | cut -f2 -d" ")
+  name=$(echo "$ip_server" | cut -f2 -d" ")
   echo "$index) $name"
 done < "$server_list_file"
 
@@ -78,45 +78,45 @@ if [ "$server_action" = "1" ]; then
         # Pour chaque serveur dans la plage
         for i in $(seq "$start" "$end"); do
           # Récupérez le serveur sélectionné à partir de la liste des serveurs distants
-          remote_server=$(sed "${i}q;d" "$server_list_file" | cut -f1 -d" ")
+          ip_server=$(sed "${i}q;d" "$server_list_file" | cut -f1 -d" ")
           port_server=$(sed "${i}q;d" "$server_list_file" | cut -f3 -d" ")
           user_server=$(sed "${i}q;d" "$server_list_file" | cut -f4 -d" ")
           password_server=$(sed "${i}q;d" "$server_list_file" | cut -f5 -d" ")
 
           # Vérifier si le host est présent dans la liste des known hosts
-          if ! (ssh-keygen -F "$remote_server" > /dev/null); then
+          if ! (ssh-keygen -F "$ip_server" > /dev/null); then
             # Ajouter le fingerprint SSH du host dans la liste des known hosts
-            ssh-keyscan "$remote_server" >> ~/.ssh/known_hosts 2>/dev/null
-            echo "Host $remote_server ajouté aux known_hosts"
+            ssh-keyscan "$ip_server" >> ~/.ssh/known_hosts 2>/dev/null
+            echo "Host $ip_server ajouté aux known_hosts"
           fi
 
           # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
-          sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$remote_server:$remote_directory"
+          sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$ip_server:$remote_directory"
 
           # verifier si le fichier est bien sur le serveur distant
-          if sshpass -p "$password_server" ssh -p "$port_server" "$user_server"@"$remote_server" "[ ! -e $remote_directory/$file_name ]"; then
+          if sshpass -p "$password_server" ssh -p "$port_server" "$user_server"@"$ip_server" "[ ! -e $remote_directory/$file_name ]"; then
             echo "Le fichier $file_name n'a pas pu être envoyé sur le serveur distant."
           fi
         done
       else
         # Récupérez le serveur sélectionné à partir de la liste des serveurs distants
-        remote_server=$(sed "${i}q;d" "$server_list_file" | cut -f1 -d" ")
+        ip_server=$(sed "${i}q;d" "$server_list_file" | cut -f1 -d" ")
         port_server=$(sed "${i}q;d" "$server_list_file" | cut -f3 -d" ")
         user_server=$(sed "${i}q;d" "$server_list_file" | cut -f4 -d" ")
         password_server=$(sed "${i}q;d" "$server_list_file" | cut -f5 -d" ")
 
         # Vérifier si le host est présent dans la liste des known hosts
-        if ! (ssh-keygen -F "$remote_server" > /dev/null); then
+        if ! (ssh-keygen -F "$ip_server" > /dev/null); then
           # Ajouter le fingerprint SSH du host dans la liste des known hosts
-          ssh-keyscan "$remote_server" >> ~/.ssh/known_hosts 2>/dev/null
-          echo "Host $remote_server ajouté aux known_hosts"
+          ssh-keyscan "$ip_server" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "Host $ip_server ajouté aux known_hosts"
         fi
 
         # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
-        sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$remote_server:$remote_directory"
+        sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$ip_server:$remote_directory"
 
         # verifier si le fichier est bien sur le serveur distant
-        if sshpass -p "$password_server" ssh -p "$port_server" "$user_server"@"$remote_server" "[ ! -e $remote_directory/$file_name ]"; then
+        if sshpass -p "$password_server" ssh -p "$port_server" "$user_server"@"$ip_server" "[ ! -e $remote_directory/$file_name ]"; then
           echo "Le fichier $file_name n'a pas pu être envoyé sur le serveur distant."
         fi
       fi
@@ -135,27 +135,26 @@ else
       # Séparez les limites supérieure et inférieure de la plage
       start=$(echo "$server_index" | cut -d '-' -f 1)
       end=$(echo "$server_index" | cut -d '-' -f 2)
-
       # Pour chaque serveur dans la plage
       for i in $(seq "$start" "$end"); do
         # Récupérez le serveur sélectionné à partir de la liste des serveurs distants
-        remote_server=$(sed "${i}q;d" "$server_list_file" | cut -f1 -d" ")
+        ip_server=$(sed "${i}q;d" "$server_list_file" | cut -f1 -d" ")
         port_server=$(sed "${i}q;d" "$server_list_file" | cut -f3 -d" ")
         user_server=$(sed "${i}q;d" "$server_list_file" | cut -f4 -d" ")
         password_server=$(sed "${i}q;d" "$server_list_file" | cut -f5 -d" ")
 
         # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
-        sshpass -p "$password_server" ssh -p "$port_server" "$user_server@$remote_server" "$command_server"
+        sshpass -p "$password_server" ssh -p "$port_server" "$user_server@$ip_server" "$command_server"
       done
     else
       # Récupérez le serveur sélectionné à partir de la liste des serveurs distants
-      remote_server=$(sed "${i}q;d" "$server_list_file" | cut -f1 -d" ")
-      port_server=$(sed "${i}q;d" "$server_list_file" | cut -f3 -d" ")
-      user_server=$(sed "${i}q;d" "$server_list_file" | cut -f4 -d" ")
-      password_server=$(sed "${i}q;d" "$server_list_file" | cut -f5 -d" ")
+      ip_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f1 -d" ")
+      port_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f3 -d" ")
+      user_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f4 -d" ")
+      password_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f5 -d" ")
 
       # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
-      sshpass -p "$password_server" ssh -p "$port_server" "$user_server@$remote_server" "$command_server"
+      sshpass -p "$password_server" ssh -p "$port_server" "$user_server@$ip_server" "$command_server"
     fi
   done
 fi
