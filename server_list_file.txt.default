@@ -1,0 +1,6 @@
+# syntax
+IP NAME PORT USER PASSWORD
+
+# Example
+192.168.1.20 Debian 22 root azert123
+192.168.1.123 Ubuntu 22 root fvdou76
