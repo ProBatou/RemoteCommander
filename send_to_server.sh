@@ -4,7 +4,7 @@
 server_list_file="$(pwd)/server_list_file.txt"
 
 while true; do
-  echo -n "Souhaitez-vous saisir les informations d'un autre serveur ? (Y|N)  "
+  echo -n "Souhaitez-vous saisir les informations d'un autre serveur ? (y|N)  "
   read answer
   case "$answer" in
     [yY]*)
@@ -100,10 +100,10 @@ if [ "$server_action" = "1" ]; then
         done
       else
         # Récupérez le serveur sélectionné à partir de la liste des serveurs distants
-        ip_server=$(sed "${i}q;d" "$server_list_file" | cut -f1 -d" ")
-        port_server=$(sed "${i}q;d" "$server_list_file" | cut -f3 -d" ")
-        user_server=$(sed "${i}q;d" "$server_list_file" | cut -f4 -d" ")
-        password_server=$(sed "${i}q;d" "$server_list_file" | cut -f5 -d" ")
+        ip_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f1 -d" ")
+        port_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f3 -d" ")
+        user_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f4 -d" ")
+        password_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f5 -d" ")
 
         # Vérifier si le host est présent dans la liste des known hosts
         if ! (ssh-keygen -F "$ip_server" > /dev/null); then
