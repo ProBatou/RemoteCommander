@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Définissez le chemin du fichier contenant la liste des serveurs distants
-server_list_file="$(pwd)/server_list_file.txt"
+server_list_file="/etc/remotecommander.conf"
 
 while true; do
   echo -n "Souhaitez-vous saisir les informations d'un autre serveur ? (y|N)  "
@@ -83,12 +83,13 @@ if [ "$server_action" = "1" ]; then
           user_server=$(sed "${i}q;d" "$server_list_file" | cut -f4 -d" ")
           password_server=$(sed "${i}q;d" "$server_list_file" | cut -f5 -d" ")
 
-          # Vérifier si le host est présent dans la liste des known hosts
-          if ! (ssh-keygen -F "$ip_server" > /dev/null); then
-            # Ajouter le fingerprint SSH du host dans la liste des known hosts
-            ssh-keyscan "$ip_server" >> ~/.ssh/known_hosts 2>/dev/null
-            echo "Host $ip_server ajouté aux known_hosts"
-          fi
+
+        # Vérifier si le host est présent dans la liste des known hosts
+        if ! (ssh-keygen -F "$ip_server" > /dev/null); then
+          # Ajouter le fingerprint SSH du host dans la liste des known hosts
+          ssh-keyscan "$ip_server" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "Host $ip_server ajouté aux known_hosts"
+        fi
 
           # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
           sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$ip_server:$remote_directory" 2>/dev/null
@@ -147,6 +148,13 @@ else
         user_server=$(sed "${i}q;d" "$server_list_file" | cut -f4 -d" ")
         password_server=$(sed "${i}q;d" "$server_list_file" | cut -f5 -d" ")
 
+        # Vérifier si le host est présent dans la liste des known hosts
+        if ! (ssh-keygen -F "$ip_server" > /dev/null); then
+          # Ajouter le fingerprint SSH du host dans la liste des known hosts
+          ssh-keyscan "$ip_server" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "Host $ip_server ajouté aux known_hosts"
+        fi
+
         # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
         sshpass -p "$password_server" ssh -p "$port_server" "$user_server@$ip_server" "$command_server"
       done
@@ -156,6 +164,13 @@ else
       port_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f3 -d" ")
       user_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f4 -d" ")
       password_server=$(sed "${server_index}q;d" "$server_list_file" | cut -f5 -d" ")
+
+      # Vérifier si le host est présent dans la liste des known hosts
+      if ! (ssh-keygen -F "$ip_server" > /dev/null); then
+        # Ajouter le fingerprint SSH du host dans la liste des known hosts
+        ssh-keyscan "$ip_server" >> ~/.ssh/known_hosts 2>/dev/null
+        echo "Host $ip_server ajouté aux known_hosts"
+      fi
 
       # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
       sshpass -p "$password_server" ssh -p "$port_server" "$user_server@$ip_server" "$command_server"
