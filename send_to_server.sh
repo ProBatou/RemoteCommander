@@ -91,11 +91,13 @@ if [ "$server_action" = "1" ]; then
           fi
 
           # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
-          sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$ip_server:$remote_directory"
-
-          # verifier si le fichier est bien sur le serveur distant
-          if sshpass -p "$password_server" ssh -p "$port_server" "$user_server"@"$ip_server" "[ ! -e $remote_directory/$file_name ]"; then
-            echo "Le fichier $file_name n'a pas pu être envoyé sur le serveur distant."
+          sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$ip_server:$remote_directory" 2>/dev/null
+          
+          # Vérification de la réussite du transfert
+          if [ "$?" -eq 0 ]; then
+            echo "Le fichier a été transféré avec succès."
+          else
+            echo "Une erreur s'est produite lors du transfert du fichier."
           fi
         done
       else
@@ -113,11 +115,13 @@ if [ "$server_action" = "1" ]; then
         fi
 
         # Utilisez sshpass pour vous connecter au serveur distant et envoyer le fichier
-        sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$ip_server:$remote_directory"
+        sshpass -p "$password_server" scp -r -P "$port_server" "$file_path" "$user_server@$ip_server:$remote_directory" 2>/dev/null
 
-        # verifier si le fichier est bien sur le serveur distant
-        if sshpass -p "$password_server" ssh -p "$port_server" "$user_server"@"$ip_server" "[ ! -e $remote_directory/$file_name ]"; then
-          echo "Le fichier $file_name n'a pas pu être envoyé sur le serveur distant."
+        # Vérification de la réussite du transfert
+        if [ "$?" -eq 0 ]; then
+          echo "Le fichier a été transféré avec succès."
+        else
+          echo "Une erreur s'est produite lors du transfert du fichier."
         fi
       fi
     done
